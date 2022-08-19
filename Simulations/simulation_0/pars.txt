@@ -1,0 +1,13 @@
+
+[1] "mu"
+function(x,y) {return(1)}
+[1] "sigma"
+function(x,y) {return( exp(log(0.3)) )}
+[1] "lambda_1"
+function(x,y) {return(exp ( (-6)) )}
+[1] "lambda_2"
+function(x,y) {return(exp ( (-6)) )}
+[1] "theta"
+function(x,y) {return( pi/4)}
+[1] "tau"
+function(x,y) {return(0.03)}
