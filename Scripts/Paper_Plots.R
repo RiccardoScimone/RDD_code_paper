@@ -9,7 +9,8 @@ for (i in 1:length(sim_vec))
   load(paste0("Simulations/",sim_vec[i],"/simulated_process.rdata"))
   real_pars = readRDS(paste0("Simulations/",sim_vec[i],"/real_pars.rds"))
   realiz_list[[i]] = simulated_process
-  p_list[[i]] = ggplot(simulated_process) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() + theme_pubclean(base_size = 40) + 
+  p_list[[i]] = ggplot(simulated_process) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() +
+    theme_pubclean(base_size = 40) + 
     scale_fill_viridis(option = "inferno") + theme(legend.text=element_text(size=30), 
                                                    legend.key.size = unit(1.8, 'cm'),legend.title = element_blank(),
                                                    legend.position = "top",
@@ -24,7 +25,7 @@ ggsave(filename = "Paper_plots/exprocess.pdf",plot = plot, width = 18,height = 8
 
 ## Figure 2###
 p = ggplot(simulated_process) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() + theme_pubclean(base_size = 40) + 
-  scale_fill_viridis(option = "inferno") + theme(legend.text=element_text(size=30), 
+  scale_fill_viridis(option = "inferno", limits = c(-4.8,4.8), breaks = seq(-4.8,4.8,length.out = 5)) + theme(legend.text=element_text(size=30), 
                                                  legend.key.size = unit(1.8, 'cm'),legend.title = element_blank(),
                                                  legend.position = "right",
                                                  axis.title = element_blank() )
@@ -40,15 +41,16 @@ for ( i in 1:length(sim_vec))
 {
   load(paste0("Simulations/",sim_vec[i],"/simulated_process_list.rdata"))
   p_list =  list()
+  lims = range(c(simulated_process_list[[1]]$process,simulated_process_list[[4]]$process,simulated_process_list[[8]]$process))
   for ( j in c(1,4,8) ){
     p_list[[j]] = ggplot(simulated_process_list[[j]]) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() + theme_pubclean(base_size = 40) + 
-      scale_fill_viridis(option = "inferno") + theme(legend.text=element_text(size=30), 
+      scale_fill_viridis(option = "inferno", breaks = round(0.9*seq(lims[1],lims[2], length.out = 5),1)) + theme(legend.text=element_text(size=30), 
                                                      legend.key.size = unit(1.8, 'cm'),legend.title = element_blank(),
                                                      legend.position = "top",
                                                      axis.title = element_blank() )
   }
   p_list = p_list[-which(sapply(p_list, is.null))]
-  plot = ggarrange(plotlist =  p_list, nrow = 1)
+  plot = ggarrange(plotlist =  p_list, nrow = 1, common.legend = T)
   
   ggsave(filename = paste0("Paper_plots/realizations",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
   
@@ -80,7 +82,7 @@ for (i in 1:length(sim_vec))
   Fou_est = readRDS(paste0("Simulations/",sim_vec[i],"/Fouedjo_results.rds"))
   Fou_anchors = readRDS(paste0("Simulations/",sim_vec[i],"/Fouedjo_anchors.rds"))
   p_list = ellipses = ellipses_anchors = list()
-  for ( j in c(1,4,8) ){
+  for ( j in c(3,9,6) ){
     temp_anchors_df = data.frame(cbind(Fou_anchors[[j]]$anchorpoints,Fou_anchors[[j]]$solutions[,1:3]))
     names(temp_anchors_df) = c("x_1","x_2","lambda_1","lambda_2","theta_deg")
     temp_anchors_df$theta_deg = temp_anchors_df$theta_deg * 180/pi
@@ -98,7 +100,7 @@ for (i in 1:length(sim_vec))
   
   plot = ggarrange(plotlist = p_list, nrow = 1)
   ggsave(filename = paste0("Paper_plots/Fou_pars_sigma_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-  knitr::plot_crop(paste0("Paper_plots/Fou_pars_sigma_ex",sim_vec[i],".pdf"))
+  knitr::plot_crop(paste0("Paper_plots/Fou_pars_mu_sigma",sim_vec[i],".pdf"))
   
   plot = ggarrange(plotlist = ellipses, nrow = 1,align = "h")
   ggsave(filename = paste0("Paper_plots/Fou_ellipses_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")

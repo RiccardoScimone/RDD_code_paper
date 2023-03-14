@@ -3,7 +3,7 @@ source("Scripts/Utilities.r")
 
 ## Specify Simulation ID
 
-sim_id = "simulation_7"
+sim_id = "simulation_0"
 dir.create(paste0("Simulations/",sim_id))
 dir.create(paste0("Simulations/",sim_id,"/plots"))
 seed = 18011996
@@ -71,7 +71,7 @@ for ( i in 1:10) simulated_process_list[[i]] = data.frame(x_1 = grid$x_1, x_2 = 
 save(simulated_process_list, file =  paste0("Simulations/",sim_id,"/simulated_process_list.Rdata"))
 
 
-p = ggplot(simulated_process) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() + theme_pubclean(base_size = 30) + 
+p = ggplot(simulated_process_list[[8]]) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() + theme_pubclean(base_size = 30) + 
   scale_fill_viridis(option = "inferno") + theme(legend.text=element_text(size=15), legend.key.size = unit(1.5, 'cm'))
 
 ggsave(filename = paste0("Simulations/",sim_id,"/plots/realization.pdf"),plot = p,width = 20,height = 15,dpi = "retina")
