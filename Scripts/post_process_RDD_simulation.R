@@ -91,8 +91,8 @@ for ( N in as.character(N_vec)){
       
       averaged_estimation[[N]][[K]]$lambda_1 = log(averaged_estimation[[N]][[K]]$lambda_1)
       averaged_estimation[[N]][[K]]$lambda_2 = log(averaged_estimation[[N]][[K]]$lambda_2)
-      p = multiple_heatmaps(averaged_estimation[[N]][[K]])
-      ggsave(filename = paste0(dir_path,"/est_pars_RDD_multiple",N,"_",K,".pdf"),plot = p,width = 30,height = 15,dpi = "retina")
+ #     p = multiple_heatmaps(averaged_estimation[[N]][[K]])
+ #     ggsave(filename = paste0(dir_path,"/est_pars_RDD_multiple",N,"_",K,".pdf"),plot = p,width = 30,height = 15,dpi = "retina")
       
     }
   }
@@ -120,10 +120,10 @@ for (N in as.character(N_vec))
 err_data = data.frame(keys)
 err_data = cbind(err_data,spatial_averaged_errors)
 names(err_data)[1:2] = c("samples","K")
-err_data$lambda_1 = log(err_data$lambda_1)
-err_data$lambda_2 = log(err_data$lambda_2)
-err_data$sigma = log(err_data$sigma)
-err_data$nugget = log(err_data$nugget)
+#err_data$lambda_1 = log(err_data$lambda_1)
+#err_data$lambda_2 = log(err_data$lambda_2)
+#err_data$sigma = log(err_data$sigma)
+#err_data$nugget = log(err_data$nugget)
 err_data_pivoted = err_data %>% pivot_longer(cols = 3:10, names_to = "pars", values_to = "mean_spatial_errs")
 
 
@@ -135,9 +135,10 @@ err_data_summarises$samples = factor(err_data_summarises$samples, levels = as.ch
 err_data_summarises = err_data_summarises %>% filter(pars != "theta")
 
 
-errors_convo = read_rds("Simulations/simulation_5/convoSPAT_errors.rds")
-errors_convo$tau = log(errors_convo$tau)
+errors_convo = read_rds("Simulations/simulation_7/convoSPAT_errors.rds")
+#errors_convo$tau = log(errors_convo$tau)
 errors_convo$nugget = errors_convo$tau
+errors_convo = errors_convo %>% mutate_at(c("lambda_1","lambda_2","sigma"), exp)
 
 errors_convo$tau = NULL
 errors_convo = errors_convo %>% pivot_longer(cols = 1:7, names_to = "pars", values_to = "mean_spatial_errs")
@@ -147,15 +148,21 @@ errors_convo = errors_convo %>% group_by(pars) %>% summarise_all(list(average = 
 errors_Fou = read_rds("Simulations/simulation_7/Fouedjo_multiple_errors.rds") 
 errors_Fou$nugget = errors_Fou$tau
 errors_Fou$tau = NULL
+errors_Fou = errors_Fou %>% mutate_at(c("lambda_1","lambda_2","sigma","nugget"), exp)
+
 errors_Fou = errors_Fou %>% pivot_longer(cols = 1:7, names_to = "pars", values_to = "mean_spatial_errs")
 errors_Fou = errors_Fou %>% group_by(pars) %>% summarise_all(list(average = mean, sd = sd))
 
-plot = ggplot(err_data_summarises, aes(x = K, y = average, colour = samples)) + geom_line() + geom_point() +
-   geom_errorbar(aes(ymin = average - sd/sqrt(10), ymax = average + sd/sqrt(10)), width = .2) +# geom_hline(data = errors_convo,aes(yintercept = average)) +
-    #geom_hline(data = errors_convo,aes(yintercept = average + sd/sqrt(10)),linetype="dashed") +  
-#  geom_hline(data = errors_convo,aes(yintercept = average - sd/sqrt(10)),linetype="dashed")+ 
-  geom_hline(data = errors_Fou,aes(yintercept = average), col = "red") + geom_hline(data = errors_Fou,aes(yintercept = average + sd/sqrt(10)),linetype="dashed",col = "red") +  
-  geom_hline(data = errors_Fou,aes(yintercept = average - sd/sqrt(10)),linetype="dashed", col = "red")+
+plot = ggplot(err_data_summarises, aes(x = K, y = log(average), colour = samples)) + geom_line() + geom_point() + 
+   #coord_trans(y = "log") +
+  scale_x_continuous(breaks = c(1,4,8,16,32)) + 
+  geom_errorbar(aes(ymin = log( average - sd/sqrt(10)), ymax = log(average + sd/sqrt(10))), width = .2) +
+  geom_hline(data = errors_convo,aes(yintercept = log(average) )) +
+  geom_hline(data = errors_convo,aes(yintercept = log(average + sd/sqrt(10)) ),linetype="dashed") +  
+  geom_hline(data = errors_convo,aes(yintercept = log(average - sd/sqrt(10)) ),linetype="dashed")+ 
+  geom_hline(data = errors_Fou,aes(yintercept = log(average) ), col = "red") + geom_hline(data = errors_Fou,aes(yintercept = log(average + sd/sqrt(10))),linetype="dashed",col = "red") +  
+  geom_hline(data = errors_Fou,aes(yintercept = log( average - sd/sqrt(10)) ),linetype="dashed", col = "red")+
+  labs(y = "Logarithm of average error") + 
   facet_wrap(~pars,scales = "free") + theme_pubclean(base_size = 30)
 
 ggsave(filename = paste0("Paper_plots/errs_curves",simulation_id,".pdf"),plot = plot, width = 22,height = 15,dpi = "retina")
