@@ -76,31 +76,32 @@ for (i in 1:length(sim_vec))
 
 
 ## Plot Fouedjo results for simulation 7
-
+ind = c(7,9,6)
 for (i in 1:length(sim_vec))
 {
   Fou_est = readRDS(paste0("Simulations/",sim_vec[i],"/Fouedjo_results.rds"))
   Fou_anchors = readRDS(paste0("Simulations/",sim_vec[i],"/Fouedjo_anchors.rds"))
   p_list = ellipses = ellipses_anchors = list()
-  for ( j in c(3,9,6) ){
+  for ( p in 1:3 ){
+    j = ind[p]
     temp_anchors_df = data.frame(cbind(Fou_anchors[[j]]$anchorpoints,Fou_anchors[[j]]$solutions[,1:3]))
     names(temp_anchors_df) = c("x_1","x_2","lambda_1","lambda_2","theta_deg")
     temp_anchors_df$theta_deg = temp_anchors_df$theta_deg * 180/pi
     temp_anchors_df$lambda_1 = temp_anchors_df$lambda_1^2
     temp_anchors_df$lambda_2 = temp_anchors_df$lambda_2^2
     Fou_est_short = Fou_est[[j]] %>% select(x_1,x_2,sigma)
-    p_list[[j]] = multiple_heatmaps(Fou_est_short)
-    ellipses[[j]] = plot_ellipses(Fou_est[[j]],8,0.5) + ggtitle("")
-    ellipses_anchors[[j]] = plot_ellipses(temp_anchors_df,8,0.5) + ggtitle("")
+    p_list[[p]] = multiple_heatmaps(Fou_est_short)
+    ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.5) + ggtitle("")
+    ellipses_anchors[[p]] = plot_ellipses(temp_anchors_df,6,0.5) + ggtitle("")
   }
-  p_list = p_list[-which(sapply(p_list, is.null))]
-  ellipses = ellipses[-which(sapply(ellipses, is.null))]
-  ellipses_anchors = ellipses_anchors[-which(sapply(ellipses_anchors, is.null))]
+ # p_list = p_list[-which(sapply(p_list, is.null))]
+ # ellipses = ellipses[-which(sapply(ellipses, is.null))]
+ # ellipses_anchors = ellipses_anchors[-which(sapply(ellipses_anchors, is.null))]
   
   
   plot = ggarrange(plotlist = p_list, nrow = 1)
   ggsave(filename = paste0("Paper_plots/Fou_pars_sigma_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-  knitr::plot_crop(paste0("Paper_plots/Fou_pars_mu_sigma",sim_vec[i],".pdf"))
+  knitr::plot_crop(paste0("Paper_plots/Fou_pars_sigma_ex",sim_vec[i],".pdf"))
   
   plot = ggarrange(plotlist = ellipses, nrow = 1,align = "h")
   ggsave(filename = paste0("Paper_plots/Fou_ellipses_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
@@ -118,13 +119,14 @@ for (i in 1:length(sim_vec))
 {
   Fou_est = readRDS(file = paste0("Simulations/",sim_vec[i],"/convoSPAT_results_estimates.rds"))
   p_list = ellipses = list()
-  for ( j in c(1,4,8) ){
+  for ( p in 1:3 ){
+    j = ind[p]
     Fou_est_short = Fou_est[[j]] %>% select(x_1,x_2,sigma)
-    p_list[[j]] = multiple_heatmaps(Fou_est_short)
-    ellipses[[j]] = plot_ellipses(Fou_est[[j]],8,0.5) + ggtitle("")
+    p_list[[p]] = multiple_heatmaps(Fou_est_short, plot_func = plot_func_2) 
+    ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.3) + ggtitle("")
   }
-  p_list = p_list[-which(sapply(p_list, is.null))]
-  ellipses = ellipses[-which(sapply(ellipses, is.null))]
+#  p_list = p_list[-which(sapply(p_list, is.null))]
+#  ellipses = ellipses[-which(sapply(ellipses, is.null))]
   
   plot = ggarrange(plotlist = p_list, nrow = 1)
   ggsave(filename = paste0("Paper_plots/convo_pars_sigma_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
@@ -175,4 +177,36 @@ ellipses = list()
   plot = ggarrange(plotlist = ellipses, nrow = 1,align = "h")
   ggsave(filename = paste0("Paper_plots/convo_ellipses_ex_anchor",sim_vec[1],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
   knitr::plot_crop(paste0("Paper_plots/convo_ellipses_ex_anchor",sim_vec[1],".pdf"))
+  
+  
+  
+  x_1 = Fou_est_short$x_1
+  x_2 = Fou_est_short$x_2
+  
+  
+  ## Plot RDD results for simulation 7
+  
+  for (i in 1:length(sim_vec))
+  {
+    Fou_est = readRDS(file = paste0("Simulations/",sim_vec[i],"/RDD_estimate_mr_810000.rds"))
+    p_list = ellipses = list()
+    for ( p in 1:3 ){
+      j = ind[p]
+      Fou_est[[j]]$x_1 = x_1
+      Fou_est[[j]]$x_2 = x_2
+      Fou_est_short = Fou_est[[j]] %>% select(x_1,x_2,sigma)
+     
+      p_list[[p]] = multiple_heatmaps(Fou_est_short, plot_func = plot_func_1) 
+      ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.8) + ggtitle("")
+    }
+    #  p_list = p_list[-which(sapply(p_list, is.null))]
+    #  ellipses = ellipses[-which(sapply(ellipses, is.null))]
+    
+    plot = ggarrange(plotlist = p_list, nrow = 1)
+    ggsave(filename = paste0("Paper_plots/RDD_pars_sigma_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
+    knitr::plot_crop(paste0("Paper_plots/RDD_pars_sigma_ex",sim_vec[i],".pdf"))
+    plot = ggarrange(plotlist = ellipses, nrow = 1,align = "h")
+    ggsave(filename = paste0("Paper_plots/RDD_ellipses_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
+    knitr::plot_crop(paste0("Paper_plots/RDD_ellipses_ex",sim_vec[i],".pdf"))
+  }
   
