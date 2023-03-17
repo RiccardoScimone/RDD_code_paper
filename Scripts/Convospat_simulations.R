@@ -5,7 +5,7 @@ library(ellipse)
 source("Scripts/Utilities.r")
 a = -1
 b = 1
-n_knot_grid = 8
+n_knot_grid = 5
 
 knot_lon = seq(a, b, length.out = n_knot_grid+1)
 knot_lat = seq(a, b, length.out = n_knot_grid+1)
@@ -14,10 +14,10 @@ knot_lon = (knot_lon[1:n_knot_grid] + knot_lon[2:(n_knot_grid+1)])/2
 knot_lat = (knot_lat[1:n_knot_grid] + knot_lat[2:(n_knot_grid+1)])/2
 knot_coord = expand.grid(knot_lon,knot_lat)
 names(knot_coord) = c("x_1", "x_2")
-simulation_id = "simulation_7"
+simulation_id = "simulation_4"
 dir_path = paste0("Simulations/",simulation_id)
 load(paste0(dir_path,"/simulated_process_list.Rdata"))
-clusters = 10
+clusters = 5
 cl = makePSOCKcluster(clusters)
 registerDoParallel(cl)
 writeLines(c(""), paste0(dir_path,"/log.txt"))
@@ -30,10 +30,11 @@ NSfit_model = foreach (realization = 1:10,.packages = c("convoSPAT")) %dopar% {
   sim_const = simulated_process_list[[realization]]
   simulated_process = sim_const#[sample(1:nrow(sim_const),N),]
   at = NSconvo_fit(coords = simulated_process[,1:2], data = simulated_process[,3],
-                          cov.model = "matern",fit.radius = 0.2, lambda.w = 0.5,
+                          cov.model = "matern",fit.radius = 0.1, lambda.w = 0.5,
                           mc.locations = knot_coord, ns.mean = T, ns.nugget = T, ns.variance = T,
                           kappa = 2, fix.kappa = T)
   sink()
+  at
 #  x11()
 #  plot(NSfit_model[[realization]],fit.radius = 0.35, xlim = 1.5*c(a,b), ylim = 1.5*c(a,b),asp = 1)
 
@@ -56,7 +57,7 @@ knot_lat = (knot_lat[1:n_knot_grid] + knot_lat[2:(n_knot_grid+1)])/2
 knot_coord = expand.grid(knot_lon,knot_lat)
 names(knot_coord) = c("x_1", "x_2")
 
-simulation_id = "simulation_7"
+simulation_id = "simulation_4"
 dir_path = paste0("Simulations/",simulation_id)
 NSfit_model = readRDS(file = paste0(dir_path,"/convoSPAT_results.rds"))
 load(paste0(dir_path,"/simulated_process_list.Rdata"))
