@@ -116,11 +116,12 @@ theta_samples = pi/2 * rstanarm::invlogit(theta_samples)
 lambda_1_estimates = rowMeans(lambda_1_samples)
 lambda_2_estimates = rowMeans(lambda_2_samples)
 theta_estimates = rowMeans(theta_samples)
+
+
 estimates = data.frame(x_1 = gridplot[,1], x_2 = gridplot[,2], 
                        lambda_1 = lambda_1_estimates, lambda_2 = lambda_2_estimates, theta = theta_estimates)
-estimates$Sigma11 = Sigma11(lambda_2_estimates, lambda_1_estimates, pi/2-theta_estimates)
-estimates$Sigma22 = Sigma22(lambda_2_estimates, lambda_1_estimates, pi/2-theta_estimates)
-estimates$Sigma12 = Sigma12(lambda_2_estimates, lambda_1_estimates, pi/2-theta_estimates)
+
+
 estimates$theta_deg = 90- 180/pi * estimates$theta
 x11()
 multiple_heatmaps(estimates)
