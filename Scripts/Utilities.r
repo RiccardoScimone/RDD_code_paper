@@ -317,13 +317,13 @@ plot_ellipses = function(data, l_out = 10,scale = 1){
 
 }
 
-add_ellipses = function(data, ggobj, color = "black"){
+add_ellipses = function(data, ggobj, color = "black",scale = 1){
   seq_1 = unique(data$x_1)
   seq_2 = unique(data$x_2)
   seq_1 = seq_1[floor(seq(1,length(seq_1), length.out = 6))]
   seq_2 = seq_2[floor(seq(1,length(seq_2), length.out = 6))]
   data_t = data %>% dplyr::filter( x_1 %in% seq_1 , x_2 %in% seq_2)
-  p = ggobj + geom_ellipse(data = data_t, aes(x0 = x_1, y0 = x_2, a = 3*sqrt(lambda_1), b = 3*sqrt(lambda_2), angle = theta_deg*pi/180),inherit.aes = F, color = color, size = 0.01)+ geom_point(data = data_t, aes(x = x_1, y = x_2), size = 3) + coord_fixed() +theme(axis.title = element_blank())
+  p = ggobj + geom_ellipse(data = data_t, aes(x0 = x_1, y0 = x_2, a = 3*scale*sqrt(lambda_1), b = 3*scale*sqrt(lambda_2), angle = theta_deg*pi/180),inherit.aes = F, color = color, size = 0.01)+ geom_point(data = data_t, aes(x = x_1, y = x_2), size = 3) + coord_fixed() +theme(axis.title = element_blank())
   return(p)
   
 }

@@ -14,8 +14,8 @@ p = ggplot(spatial_data) +
   geom_point(aes(x = Longitude, y = Latitude, color = logPrecip),size=4) + 
   scale_color_viridis(option = "viridis", direction = -1)+ 
   theme_pubclean(base_size = 50)+ 
-  theme(legend.text=element_text(size=40), legend.key.size = unit(2.5, 'cm'))+
-  labs(col = "Logarithm of Yearly precipitation")+
+  theme(legend.text=element_text(size=40), legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
+  labs(col = "Logarithm of Yearly precipitation")+ ggtitle("(a)") + 
   coord_fixed()
 
 ggsave(filename = "Colorado/Coloradodata.pdf",
@@ -32,8 +32,8 @@ p = ggplot(grid) +
   geom_tile(aes(x = longitude, y = latitude, fill = elevation)) + 
   scale_fill_viridis(option = "turbo")+ 
   theme_pubclean(base_size = 50)+ 
-  theme(legend.text=element_text(size=40), legend.key.size = unit(2.5, 'cm'))+
-  labs(col = "Elevation")+
+  theme(legend.text=element_text(size=40), legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
+  labs(col = "Elevation")+ggtitle("(b)") + 
   coord_fixed()
 
 ggsave(filename = "Colorado/Coloradoelev.pdf",
@@ -58,8 +58,8 @@ rdd_colorado_mu = ggplot(pars_rdd_toplot) +
   scale_fill_viridis(option = "viridis", direction = -1)+ 
   theme_pubclean(base_size = 50)+ 
   theme(legend.text=element_text(size=40), 
-        legend.key.size = unit(2.5, 'cm'))+
-  labs(fill = expression(mu~" "))+
+        legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
+  labs(fill = expression(mu~" "))+ggtitle("(c)") + 
   coord_fixed()
 
 
@@ -68,8 +68,8 @@ rdd_colorado_sigma = ggplot(pars_rdd_toplot) +
   scale_fill_viridis(option = "viridis", direction = -1)+ 
   theme_pubclean(base_size = 50)+ 
   theme(legend.text=element_text(size=40), 
-        legend.key.size = unit(2.5, 'cm'))+
-  labs(fill = expression(sigma~" "))+
+        legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
+  labs(fill = expression(sigma~" "))+ggtitle("(d)") + 
   coord_fixed()
 
 
@@ -78,7 +78,7 @@ rdd_colorado_tau = ggplot(pars_rdd_toplot) +
   scale_fill_viridis(option = "viridis", direction = -1)+ 
   theme_pubclean(base_size = 50)+ 
   theme(legend.text=element_text(size=40), 
-        legend.key.size = unit(2.5, 'cm'))+
+        legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
   labs(fill = expression(tau~" "))+
   coord_fixed()
 
@@ -101,7 +101,8 @@ ggsave(filename = "Colorado/Coloradotaurdd.pdf",
 
 knitr::plot_crop("Colorado/Coloradotaurdd.pdf")
 
-p_ell = add_ellipses(est_rdd %>% rename(x_1 = longitude,x_2 = latitude),p,scale = 0.5)
+p_ell = add_ellipses(est_rdd %>% rename(x_1 = longitude,x_2 = latitude),p,scale = 0.5) + ggtitle("")+ 
+  scale_x_continuous(breaks = seq(-108,-102, by = 2)) +scale_y_continuous(breaks = 37:41)
 
 ggsave(filename = "Colorado/Coloradoellipsesrdd.pdf",
        plot = p_ell, width = 20,height = 15,dpi = "retina")

@@ -40,7 +40,7 @@ conf$removeSamplers(ind = c(10,11,12))
 
 
 # Add block samplers
-cut_lat = cut(knot_coord[,1],breaks = 4)
+cut_lat = cut(knot_coord[,1],breaks = 3)
 cut_lon = cut(knot_coord[,2],breaks = 2)
 cut = as.factor(paste0(cut_lat,cut_lon))
 table(cut)
@@ -80,31 +80,31 @@ knot_dist_pred = sqrt(nsCrossdist(knot_coord, gridplot, isotropic = TRUE)$dist1_
 
 library(foreach)
 library(doParallel)
-cl = makePSOCKcluster(12)
-registerDoParallel(cl)
-dir_path = "Colorado"
-writeLines(c(""), paste0(dir_path,"/log.txt"))
-ret = foreach(j = 1:nrow(samples),.packages = c("BayesNSGP"), .combine = "cbind")%dopar%{
-  sink(paste0(dir_path,"/log.txt"),append = T)
-  print(j)
-  sink()
-  w_lambda1_j = samples[j,paste("w1_Sigma[",1:number_of_knots,"]",sep = "")]
-  w_lambda2_j = samples[j,paste("w2_Sigma[",1:number_of_knots,"]",sep = "")]
-  w_theta_j =  samples[j,paste("w3_Sigma[",1:number_of_knots,"]",sep = "")]
-  Pmat_theta_j = matern_corr(knot_dist_pred, samples[j,"SigmaGP_phi[2]"], nu_latent)
-  Pmat_eig_j = matern_corr(knot_dist_pred, samples[j,"SigmaGP_phi[1]"], nu_latent)
-  cbind(samples[j,"SigmaGP_mu[1]"] + samples[j,"SigmaGP_sigma[1]"] * Pmat_eig_j %*% w_lambda1_j,
-  samples[j,"SigmaGP_mu[1]"] + samples[j,"SigmaGP_sigma[1]"] * Pmat_eig_j %*% w_lambda2_j,
-  samples[j,"SigmaGP_mu[2]"] + samples[j,"SigmaGP_sigma[2]"] * Pmat_theta_j %*% w_theta_j)
-}
-stopCluster(cl)
-
-lambda_1_samples = ret[,seq(1,14998, by = 3)]
-lambda_2_samples = ret[,seq(2,14999, by = 3)]
-theta_samples = ret[,seq(3,15000, by = 3)]
-
-
-save(list = c("lambda_1_samples","lambda_2_samples","theta_samples"), file = "Colorado/Aniso_samples2.rdata")
+# cl = makePSOCKcluster(12)
+# registerDoParallel(cl)
+# dir_path = "Colorado"
+# writeLines(c(""), paste0(dir_path,"/log.txt"))
+# ret = foreach(j = 1:nrow(samples),.packages = c("BayesNSGP"), .combine = "cbind")%dopar%{
+#   sink(paste0(dir_path,"/log.txt"),append = T)
+#   print(j)
+#   sink()
+#   w_lambda1_j = samples[j,paste("w1_Sigma[",1:number_of_knots,"]",sep = "")]
+#   w_lambda2_j = samples[j,paste("w2_Sigma[",1:number_of_knots,"]",sep = "")]
+#   w_theta_j =  samples[j,paste("w3_Sigma[",1:number_of_knots,"]",sep = "")]
+#   Pmat_theta_j = matern_corr(knot_dist_pred, samples[j,"SigmaGP_phi[2]"], nu_latent)
+#   Pmat_eig_j = matern_corr(knot_dist_pred, samples[j,"SigmaGP_phi[1]"], nu_latent)
+#   cbind(samples[j,"SigmaGP_mu[1]"] + samples[j,"SigmaGP_sigma[1]"] * Pmat_eig_j %*% w_lambda1_j,
+#   samples[j,"SigmaGP_mu[1]"] + samples[j,"SigmaGP_sigma[1]"] * Pmat_eig_j %*% w_lambda2_j,
+#   samples[j,"SigmaGP_mu[2]"] + samples[j,"SigmaGP_sigma[2]"] * Pmat_theta_j %*% w_theta_j)
+# }
+# stopCluster(cl)
+# 
+# lambda_1_samples = ret[,seq(1,14998, by = 3)]
+# lambda_2_samples = ret[,seq(2,14999, by = 3)]
+# theta_samples = ret[,seq(3,15000, by = 3)]
+# 
+# 
+# save(list = c("lambda_1_samples","lambda_2_samples","theta_samples"), file = "Colorado/Aniso_samples2.rdata")
 load("Colorado/Aniso_samples.rdata")
 source("Scripts/Utilities.r")
 
