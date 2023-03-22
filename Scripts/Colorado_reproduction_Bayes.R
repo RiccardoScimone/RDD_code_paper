@@ -105,37 +105,30 @@ library(doParallel)
 # 
 # 
 # save(list = c("lambda_1_samples","lambda_2_samples","theta_samples"), file = "Colorado/Aniso_samples2.rdata")
-load("Colorado/Aniso_samples.rdata")
+load("Colorado/Aniso_samples2.rdata")
+load("Colorado/samples.Rdata")
 source("Scripts/Utilities.r")
 
 lambda_1_samples = exp(lambda_1_samples)
 lambda_2_samples = exp(lambda_2_samples)
 theta_samples = pi/2 * rstanarm::invlogit(theta_samples)
 
+samples = data.frame(samples)
+mu_estimate = mean(samples$beta)
+sigma_estimate = mean(samples$alpha)
+tau_estimate = mean(samples$delta)
 ## Estimate
 lambda_1_estimates = rowMeans(lambda_1_samples)
 lambda_2_estimates = rowMeans(lambda_2_samples)
 theta_estimates = rowMeans(theta_samples)
 
+gridplot = read.csv("Colorado/Colorado_grid.csv")
+
 
 estimates = data.frame(x_1 = gridplot[,1], x_2 = gridplot[,2], 
-                       lambda_1 = lambda_1_estimates, lambda_2 = lambda_2_estimates, theta = theta_estimates)
+                       lambda_1 = lambda_1_estimates, 
+                       lambda_2 = lambda_2_estimates, 
+                       theta = theta_estimates)
 
 
-estimates$theta_deg = 90- 180/pi * estimates$theta
-x11()
-multiple_heatmaps(estimates)
-x11()
-plot_ellipses(data = estimates)
-
-
-library(tidyverse)
-## study just interesting samples
-
-samples_f = data.frame(samples) %>% dplyr::select(!(starts_with("w")))
-
-x11()
-par(mfrow = c(2,5))
-for ( i in 1:9)
-  plot(samples[,i], type = "l", main = colnames(samples)[i], xlab = "Iteration", ylab = "")
-
+write_rds(estimates, file = "Colorado/Paciorek_estimates.rds")

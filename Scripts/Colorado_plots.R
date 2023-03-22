@@ -15,7 +15,7 @@ p = ggplot(spatial_data) +
   scale_color_viridis(option = "viridis", direction = -1)+ 
   theme_pubclean(base_size = 50)+ 
   theme(legend.text=element_text(size=40), legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
-  labs(col = "Logarithm of Yearly precipitation")+ ggtitle("(a)") + 
+  labs(col = "Logarithm of Yearly precipitation")+ ggtitle("(b)") + 
   coord_fixed()
 
 ggsave(filename = "Colorado/Coloradodata.pdf",
@@ -33,7 +33,7 @@ p = ggplot(grid) +
   scale_fill_viridis(option = "turbo")+ 
   theme_pubclean(base_size = 50)+ 
   theme(legend.text=element_text(size=40), legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
-  labs(col = "Elevation")+ggtitle("(b)") + 
+  labs(col = "Elevation")+ggtitle("(a)") + 
   coord_fixed()
 
 ggsave(filename = "Colorado/Coloradoelev.pdf",
@@ -101,7 +101,7 @@ ggsave(filename = "Colorado/Coloradotaurdd.pdf",
 
 knitr::plot_crop("Colorado/Coloradotaurdd.pdf")
 
-p_ell = add_ellipses(est_rdd %>% rename(x_1 = longitude,x_2 = latitude),p,scale = 0.5) + ggtitle("")+ 
+p_ell = add_ellipses(est_rdd %>% rename(x_1 = longitude,x_2 = latitude),p,scale = 0.5) + ggtitle("RDD estimates")+ 
   scale_x_continuous(breaks = seq(-108,-102, by = 2)) +scale_y_continuous(breaks = 37:41)
 
 ggsave(filename = "Colorado/Coloradoellipsesrdd.pdf",
@@ -110,4 +110,53 @@ ggsave(filename = "Colorado/Coloradoellipsesrdd.pdf",
 
 knitr::plot_crop("Colorado/Coloradoellipsesrdd.pdf")
 
-## passiamo a Fouedjo
+Pac_est = read_rds("Colorado/Paciorek_estimates.rds")
+
+p_ell = add_ellipses(Pac_est%>%
+                       filter(x_1 >= x_grid[1], x_1 <= x_grid[100],
+                              x_2 >= y_grid[1],  x_2 <= y_grid[100]),p,scale = 0.35) + ggtitle("estimates by model (3.5)")+ 
+  scale_x_continuous(breaks = seq(-108,-102, by = 2)) +scale_y_continuous(breaks = 37:41)
+
+ggsave(filename = "Colorado/Coloradoellipsespac.pdf",
+       plot = p_ell, width = 20,height = 15,dpi = "retina")
+
+
+knitr::plot_crop("Colorado/Coloradoellipsesrdd.pdf")
+## Confronto stime di teta
+
+rdd_colorado_teta = ggplot(pars_rdd_toplot) + 
+  geom_tile(aes(x = longitude, y = latitude, fill = theta_deg)) + 
+  scale_fill_viridis(option = "viridis", direction = -1)+ 
+  theme_pubclean(base_size = 50)+ 
+  theme(legend.text=element_text(size=40), 
+        legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
+  labs(fill = expression(theta~"(degrees)"))+
+  coord_fixed()
+
+
+ggsave(filename = "Colorado/Coloradothetardd.pdf",
+       plot = rdd_colorado_teta, width = 20,height = 15,dpi = "retina")
+
+
+knitr::plot_crop("Colorado/Coloradothetardd.pdf")
+
+
+Pac_colorado_teta  = ggplot(Pac_est %>% rename(longitude = x_1,latitude = x_2)%>%
+                              filter(longitude >= x_grid[1], longitude <= x_grid[100],
+                                     latitude >= y_grid[1],  latitude <= y_grid[100]) ) + 
+  geom_tile(aes(x = longitude, y = latitude, fill = theta_deg)) + 
+  scale_fill_viridis(option = "viridis", direction = -1)+ 
+  theme_pubclean(base_size = 50)+ 
+  theme(legend.text=element_text(size=40), 
+        legend.key.size = unit(2.5, 'cm'),plot.title = element_text(hjust = 0.5))+
+  labs(fill = expression(theta~"(degrees)"))+
+  coord_fixed()
+
+
+ggsave(filename = "Colorado/ColoradothetaPac.pdf",
+       plot = Pac_colorado_teta, width = 20,height = 15,dpi = "retina")
+
+
+knitr::plot_crop("Colorado/ColoradothetaPac.pdf")
+
+
