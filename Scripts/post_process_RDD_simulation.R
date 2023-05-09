@@ -170,16 +170,16 @@ errors_Fou$pars %<>% factor(levels =
 errors_convo$pars %<>% factor(levels = 
                               c("mu","sigma","lambda[1]","lambda[2]","theta[deg]","phi","tau"))
 
-plot = ggplot(err_data_summarises, aes(x = K, y = log(average), colour = samples)) + geom_line() + geom_point() + 
+plot = ggplot(err_data_summarises %>% filter(!pars == "phi"), aes(x = K, y = log(average), colour = samples)) + geom_line() + geom_point() + 
    #coord_trans(y = "log") +
   facet_wrap(~pars,scales = "free",labeller = label_parsed) + theme_pubclean(base_size = 30)+
   scale_x_continuous(breaks = c(1,4,8,16,32)) + 
   geom_errorbar(aes(ymin = log( average - sd/sqrt(10)), ymax = log(average + sd/sqrt(10))), width = .2) +
-  geom_hline(data = errors_convo,aes(yintercept = log(average) )) +
-  geom_hline(data = errors_convo,aes(yintercept = log(average + sd/sqrt(10)) ),linetype="dashed") +  
-  geom_hline(data = errors_convo,aes(yintercept = log(average - sd/sqrt(10)) ),linetype="dashed")+ 
-  geom_hline(data = errors_Fou,aes(yintercept = log(average) ), col = "red") + geom_hline(data = errors_Fou,aes(yintercept = log(average + sd/sqrt(10))),linetype="dashed",col = "red") +  
-  geom_hline(data = errors_Fou,aes(yintercept = log( average - sd/sqrt(10)) ),linetype="dashed", col = "red")+
+  geom_hline(data = errors_convo%>% filter(!pars == "phi"),aes(yintercept = log(average) )) +
+  geom_hline(data = errors_convo%>% filter(!pars == "phi"),aes(yintercept = log(average + sd/sqrt(10)) ),linetype="dashed") +  
+  geom_hline(data = errors_convo%>% filter(!pars == "phi"),aes(yintercept = log(average - sd/sqrt(10)) ),linetype="dashed")+ 
+  geom_hline(data = errors_Fou%>% filter(!pars == "phi"),aes(yintercept = log(average) ), col = "red") + geom_hline(data = errors_Fou%>% filter(!pars == "phi"),aes(yintercept = log(average + sd/sqrt(10))),linetype="dashed",col = "red") +  
+  geom_hline(data = errors_Fou%>% filter(!pars == "phi"),aes(yintercept = log( average - sd/sqrt(10)) ),linetype="dashed", col = "red")+
   labs(y = "Logarithm of spatially averaged error") 
 
 ggsave(filename = paste0("Paper_plots/errs_curves",simulation_id,".pdf"),plot = plot, width = 22,height = 15,dpi = "retina")
