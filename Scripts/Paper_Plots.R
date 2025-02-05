@@ -9,12 +9,12 @@ for (i in 1:length(sim_vec))
   load(paste0("Simulations/",sim_vec[i],"/simulated_process.rdata"))
   real_pars = readRDS(paste0("Simulations/",sim_vec[i],"/real_pars.rds"))
   realiz_list[[i]] = simulated_process
-  p_list[[i]] = ggplot(simulated_process) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() +
+  p_list[[i]] = ggplot(simulated_process) + geom_tile(mapping = aes(x_1,x_2, fill = process)) + coord_fixed() + ggtitle(paste0("(",letters[i],")")) +
     theme_pubclean(base_size = 40) + 
     scale_fill_viridis(option = "inferno") + theme(legend.text=element_text(size=30), 
                                                    legend.key.size = unit(1.8, 'cm'),legend.title = element_blank(),
                                                    legend.position = "top",
-                                                   axis.title = element_blank() )
+                                                   axis.title = element_blank(),plot.title = element_text(hjust = 0.5,size = 40) )
 #  if(i > 1)
 #  p_list[[i]] = add_ellipses(real_pars,p_list[[i]])
 }
@@ -77,6 +77,8 @@ for (i in 1:length(sim_vec))
 
 ## Plot Fouedjo results for simulation 7
 ind = c(7,9,6)
+l1 = c("(a)","(b)","(c)")
+l2 = c("(d)","(e)","(f)")
 for (i in 1:length(sim_vec))
 {
   Fou_est = readRDS(paste0("Simulations/",sim_vec[i],"/Fouedjo_results.rds"))
@@ -90,8 +92,8 @@ for (i in 1:length(sim_vec))
     temp_anchors_df$lambda_1 = temp_anchors_df$lambda_1^2
     temp_anchors_df$lambda_2 = temp_anchors_df$lambda_2^2
     Fou_est_short = Fou_est[[j]] %>% select(x_1,x_2,sigma)
-    p_list[[p]] = multiple_heatmaps(Fou_est_short)
-    ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.5) + ggtitle("")
+    p_list[[p]] = multiple_heatmaps(data = Fou_est_short,title = l1[p])
+    ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.5) + ggtitle(l2[p]) + theme(plot.title = element_text(hjust = 0.5,size = 40))
     ellipses_anchors[[p]] = plot_ellipses(temp_anchors_df,6,0.5) + ggtitle("")
   }
  # p_list = p_list[-which(sapply(p_list, is.null))]
@@ -101,15 +103,15 @@ for (i in 1:length(sim_vec))
   
   plot = ggarrange(plotlist = p_list, nrow = 1)
   ggsave(filename = paste0("Paper_plots/Fou_pars_sigma_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-  knitr::plot_crop(paste0("Paper_plots/Fou_pars_sigma_ex",sim_vec[i],".pdf"))
+#  knitr::plot_crop(paste0("Paper_plots/Fou_pars_sigma_ex",sim_vec[i],".pdf"))
   
   plot = ggarrange(plotlist = ellipses, nrow = 1,align = "h")
   ggsave(filename = paste0("Paper_plots/Fou_ellipses_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-  knitr::plot_crop(paste0("Paper_plots/Fou_ellipses_ex",sim_vec[i],".pdf"))
+#  knitr::plot_crop(paste0("Paper_plots/Fou_ellipses_ex",sim_vec[i],".pdf"))
   
   plot = ggarrange(plotlist = ellipses_anchors, nrow = 1,align = "h")
   ggsave(filename = paste0("Paper_plots/Fou_ellipses_exanchors",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-  knitr::plot_crop(paste0("Paper_plots/Fou_ellipses_exanchors",sim_vec[i],".pdf"))
+#  knitr::plot_crop(paste0("Paper_plots/Fou_ellipses_exanchors",sim_vec[i],".pdf"))
 }
 
 
@@ -122,18 +124,18 @@ for (i in 1:length(sim_vec))
   for ( p in 1:3 ){
     j = ind[p]
     Fou_est_short = Fou_est[[j]] %>% select(x_1,x_2,sigma)
-    p_list[[p]] = multiple_heatmaps(Fou_est_short, plot_func = plot_func_2) 
-    ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.3) + ggtitle("")
+    p_list[[p]] = multiple_heatmaps(Fou_est_short, plot_func = plot_func_1,title = l1[p]) 
+    ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.3) + ggtitle(l2[p]) + theme(plot.title = element_text(hjust = 0.5,size = 40))
   }
 #  p_list = p_list[-which(sapply(p_list, is.null))]
 #  ellipses = ellipses[-which(sapply(ellipses, is.null))]
   
   plot = ggarrange(plotlist = p_list, nrow = 1)
   ggsave(filename = paste0("Paper_plots/convo_pars_sigma_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-  knitr::plot_crop(paste0("Paper_plots/convo_pars_sigma_ex",sim_vec[i],".pdf"))
+#  knitr::plot_crop(paste0("Paper_plots/convo_pars_sigma_ex",sim_vec[i],".pdf"))
   plot = ggarrange(plotlist = ellipses, nrow = 1,align = "h")
   ggsave(filename = paste0("Paper_plots/convo_ellipses_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-  knitr::plot_crop(paste0("Paper_plots/convo_ellipses_ex",sim_vec[i],".pdf"))
+#  knitr::plot_crop(paste0("Paper_plots/convo_ellipses_ex",sim_vec[i],".pdf"))
 }
 
 
@@ -186,17 +188,23 @@ ellipses = list()
   
   ## Plot RDD results for simulation 7
   
+  
+  
   for (i in 1:length(sim_vec))
   {
     Fou_est = readRDS(file = paste0("Simulations/",sim_vec[i],"/RDD_estimate_mr_810000.rds"))
     p_list = ellipses = list()
+    low = Inf
+    up = -Inf
     for ( p in 1:3 ){
       j = ind[p]
       Fou_est[[j]]$x_1 = x_1
       Fou_est[[j]]$x_2 = x_2
+      low = min(Fou_est[[j]]$sigma,low)
+      up = max(Fou_est[[j]]$sigma,up)
       Fou_est_short = Fou_est[[j]] %>% select(x_1,x_2,sigma)
      
-      p_list[[p]] = multiple_heatmaps(Fou_est_short, plot_func = plot_func_1) 
+      p_list[[p]] = multiple_heatmaps(Fou_est_short, plot_func = plot_func_1, unif = T,up = up, low = low) 
       ellipses[[p]] = plot_ellipses(Fou_est[[j]],6,0.8) + ggtitle("")
     }
     #  p_list = p_list[-which(sapply(p_list, is.null))]
@@ -204,9 +212,9 @@ ellipses = list()
     
     plot = ggarrange(plotlist = p_list, nrow = 1)
     ggsave(filename = paste0("Paper_plots/RDD_pars_sigma_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-    knitr::plot_crop(paste0("Paper_plots/RDD_pars_sigma_ex",sim_vec[i],".pdf"))
+ #   knitr::plot_crop(paste0("Paper_plots/RDD_pars_sigma_ex",sim_vec[i],".pdf"))
     plot = ggarrange(plotlist = ellipses, nrow = 1,align = "h")
     ggsave(filename = paste0("Paper_plots/RDD_ellipses_ex",sim_vec[i],".pdf"),plot = plot, width = 18,height = 8,dpi = "retina")
-    knitr::plot_crop(paste0("Paper_plots/RDD_ellipses_ex",sim_vec[i],".pdf"))
+  #  knitr::plot_crop(paste0("Paper_plots/RDD_ellipses_ex",sim_vec[i],".pdf"))
   }
   
